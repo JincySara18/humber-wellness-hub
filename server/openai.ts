@@ -21,7 +21,7 @@ export async function getChatbotResponse(message: string): Promise<string> {
             "If asked about complex personal issues, encourage seeking professional help through the college's counseling services.",
         },
         {
-          role: "user",
+          role: "user"
           content: message,
         },
       ],

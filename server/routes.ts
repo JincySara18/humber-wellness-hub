@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { getChatbotResponse } from "./openai";
+import { getChatbotResponse } from "./nlp";
 import { insertAppointmentSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -24,13 +24,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create appointment
   app.post("/api/appointments", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    
+
     const parsed = insertAppointmentSchema.parse({
       ...req.body,
       userId: req.user.id,
       status: "scheduled",
     });
-    
+
     const appointment = await storage.createAppointment(parsed);
     res.status(201).json(appointment);
   });
@@ -38,17 +38,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Chat endpoint
   app.post("/api/chat", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    
+
     const { message } = req.body;
     const response = await getChatbotResponse(message);
-    
+
     const chatMessage = await storage.saveChatMessage({
       userId: req.user.id,
       message,
       response,
       timestamp: new Date(),
     });
-    
+
     res.json(chatMessage);
   });
 
