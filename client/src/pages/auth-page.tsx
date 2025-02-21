@@ -9,16 +9,11 @@ import { insertUserSchema } from "@shared/schema";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLocation } from "wouter";
 import { Loader2 } from "lucide-react";
+import { useEffect } from "react";
 
 export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
   const [, setLocation] = useLocation();
-
-  // Redirect if already logged in
-  if (user) {
-    setLocation("/");
-    return null;
-  }
 
   const loginForm = useForm({
     resolver: zodResolver(insertUserSchema.pick({ username: true, password: true })),
@@ -27,6 +22,16 @@ export default function AuthPage() {
   const registerForm = useForm({
     resolver: zodResolver(insertUserSchema),
   });
+
+  useEffect(() => {
+    if (user) {
+      setLocation("/");
+    }
+  }, [user, setLocation]);
+
+  if (user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen flex">
