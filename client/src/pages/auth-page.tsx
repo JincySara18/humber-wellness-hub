@@ -150,12 +150,12 @@ export default function AuthPage() {
       </div>
 
       <div className="hidden lg:flex flex-1 bg-[#14234c] items-center justify-center p-8">
-        <div className="max-w-lg text-white">
+        <div className="max-w-lg text-[#d4a82b]">
           <h1 className="text-4xl font-bold mb-4">Welcome to Humber Wellness Hub</h1>
-          <p className="text-lg mb-6 text-gray-200">
+          <p className="text-lg mb-6 text-[#d4a82b] opacity-90">
             Your one-stop platform for academic counseling, mental wellness, and career guidance.
           </p>
-          <ul className="space-y-4">
+          <ul className="space-y-4 text-[#d4a82b]">
             <li className="flex items-center">
               <span className="mr-2 text-[#d4a82b]">✓</span>
               Chat with our AI counselor 24/7
