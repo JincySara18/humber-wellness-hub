@@ -149,23 +149,23 @@ export default function AuthPage() {
         </Card>
       </div>
 
-      <div className="hidden lg:flex flex-1 bg-primary items-center justify-center p-8">
+      <div className="hidden lg:flex flex-1 bg-[#14234c] items-center justify-center p-8">
         <div className="max-w-lg text-white">
           <h1 className="text-4xl font-bold mb-4">Welcome to Humber Wellness Hub</h1>
-          <p className="text-lg mb-6">
+          <p className="text-lg mb-6 text-gray-200">
             Your one-stop platform for academic counseling, mental wellness, and career guidance.
           </p>
           <ul className="space-y-4">
             <li className="flex items-center">
-              <span className="mr-2">✓</span>
+              <span className="mr-2 text-[#d4a82b]">✓</span>
               Chat with our AI counselor 24/7
             </li>
             <li className="flex items-center">
-              <span className="mr-2">✓</span>
+              <span className="mr-2 text-[#d4a82b]">✓</span>
               Book appointments with academic advisors
             </li>
             <li className="flex items-center">
-              <span className="mr-2">✓</span>
+              <span className="mr-2 text-[#d4a82b]">✓</span>
               Access career resources and wellness tools
             </li>
           </ul>
