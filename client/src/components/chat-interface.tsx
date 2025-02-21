@@ -5,8 +5,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { ChatMessage } from "@shared/schema";
-import { Send, Loader2, AlertCircle } from "lucide-react";
+import { Send, Loader2, AlertCircle, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "wouter";
 
 export default function ChatInterface() {
   const [message, setMessage] = useState("");
@@ -27,7 +28,7 @@ export default function ChatInterface() {
     onError: (error: Error) => {
       toast({
         title: "Message Failed",
-        description: "Couldn't send your message. Please try again.",
+        description: "Unable to send your message. Please try again later.",
         variant: "destructive",
       });
     },
@@ -54,12 +55,19 @@ export default function ChatInterface() {
               </div>
               <div className="flex items-start">
                 <div className="bg-primary text-primary-foreground rounded-lg p-3 max-w-[80%]">
-                  {chat.response.includes("not available") || 
-                   chat.response.includes("having trouble") || 
-                   chat.response.includes("technical difficulties") ? (
-                    <div className="flex items-center gap-2 text-destructive">
-                      <AlertCircle className="h-4 w-4" />
-                      <p>{chat.response}</p>
+                  {chat.response.includes("AI counselor service is currently unavailable") || 
+                   chat.response.includes("service is not properly configured") ? (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <p>{chat.response}</p>
+                      </div>
+                      <Link href="/appointments">
+                        <Button variant="secondary" size="sm" className="mt-2">
+                          <Calendar className="h-4 w-4 mr-2" />
+                          Book Appointment
+                        </Button>
+                      </Link>
                     </div>
                   ) : (
                     <p>{chat.response}</p>

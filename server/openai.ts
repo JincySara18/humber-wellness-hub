@@ -26,7 +26,6 @@ export async function getChatbotResponse(message: string): Promise<string> {
         },
       ],
       max_tokens: 300,
-      timeout: 10000, // 10 second timeout
     });
 
     return response.choices[0].message.content || 
@@ -34,18 +33,19 @@ export async function getChatbotResponse(message: string): Promise<string> {
   } catch (error: any) {
     console.error("OpenAI API error:", error);
 
-    if (error.code === 'ECONNABORTED') {
-      return "I'm experiencing some delays. Please try again in a moment.";
+    if (error.code === 'insufficient_quota' || 
+        (error.response?.status === 429 && error.message.includes('quota'))) {
+      return "I apologize, but the AI counselor service is currently unavailable due to high demand. Please try booking an appointment with one of our counselors instead.";
     }
 
     if (error.response?.status === 429) {
-      return "I'm currently handling too many requests. Please try again in a few minutes.";
+      return "The AI counselor is currently busy. Please try again in a few minutes.";
     }
 
     if (error.response?.status === 401) {
-      return "The AI counselor is temporarily unavailable. Please try again later or contact support.";
+      return "The AI counselor service is not properly configured. Please contact support.";
     }
 
-    return "I apologize, but I'm having technical difficulties. Please try again later.";
+    return "I apologize, but I'm having trouble processing your request. You may want to try booking an appointment with one of our counselors instead.";
   }
 }
