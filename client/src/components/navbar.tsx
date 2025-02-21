@@ -2,16 +2,52 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuList,
-} from "@/components/ui/navigation-menu";
-import { MessageSquare, Calendar, BookOpen, LogOut } from "lucide-react";
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Menu, MessageSquare, Calendar, BookOpen, LogOut } from "lucide-react";
+import { useState } from "react";
 
 export default function Navbar() {
   const { user, logoutMutation } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
 
   if (!user) return null;
+
+  const navItems = [
+    { href: "/chat", icon: MessageSquare, label: "Chat" },
+    { href: "/appointments", icon: Calendar, label: "Appointments" },
+    { href: "/resources", icon: BookOpen, label: "Resources" },
+  ];
+
+  const NavLinks = ({ mobile = false, onItemClick = () => {} }) => (
+    <>
+      {navItems.map((item) => (
+        <Link key={item.href} href={item.href}>
+          <Button
+            variant="ghost"
+            className={`flex items-center ${mobile ? 'w-full justify-start' : ''}`}
+            onClick={onItemClick}
+          >
+            <item.icon className="h-4 w-4 mr-2" />
+            {item.label}
+          </Button>
+        </Link>
+      ))}
+      <Button
+        variant="ghost"
+        className={`flex items-center ${mobile ? 'w-full justify-start' : ''}`}
+        onClick={() => {
+          logoutMutation.mutate();
+          onItemClick();
+        }}
+      >
+        <LogOut className="h-4 w-4 mr-2" />
+        Logout
+      </Button>
+    </>
+  );
 
   return (
     <nav className="border-b">
@@ -21,44 +57,24 @@ export default function Navbar() {
             <a className="text-xl font-bold text-primary">Humber Wellness Hub</a>
           </Link>
 
-          <NavigationMenu>
-            <NavigationMenuList className="flex space-x-4">
-              <NavigationMenuItem>
-                <Link href="/chat">
-                  <Button variant="ghost" className="flex items-center">
-                    <MessageSquare className="mr-2 h-4 w-4" />
-                    Chat
-                  </Button>
-                </Link>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link href="/appointments">
-                  <Button variant="ghost" className="flex items-center">
-                    <Calendar className="mr-2 h-4 w-4" />
-                    Appointments
-                  </Button>
-                </Link>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link href="/resources">
-                  <Button variant="ghost" className="flex items-center">
-                    <BookOpen className="mr-2 h-4 w-4" />
-                    Resources
-                  </Button>
-                </Link>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Button
-                  variant="ghost"
-                  className="flex items-center"
-                  onClick={() => logoutMutation.mutate()}
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Logout
-                </Button>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex space-x-4">
+            <NavLinks />
+          </div>
+
+          {/* Mobile Navigation */}
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild className="md:hidden">
+              <Button variant="ghost" size="icon">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[240px] sm:w-[280px]">
+              <div className="flex flex-col space-y-4 mt-6">
+                <NavLinks mobile onItemClick={() => setIsOpen(false)} />
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </nav>

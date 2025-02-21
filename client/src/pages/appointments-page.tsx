@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useForm } from "react-hook-form";
@@ -16,7 +15,7 @@ import type { Counselor, Appointment } from "@shared/schema";
 
 export default function AppointmentsPage() {
   const [selectedDate, setSelectedDate] = useState<Date>();
-  
+
   const { data: counselors } = useQuery<Counselor[]>({
     queryKey: ["/api/counselors"],
   });
@@ -41,15 +40,15 @@ export default function AppointmentsPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className="container mx-auto px-4 py-6 md:py-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <Card>
             <CardHeader>
               <CardTitle>Available Counselors</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {counselors?.map((counselor) => (
                   <CounselorCard key={counselor.id} counselor={counselor} />
                 ))}
@@ -59,7 +58,7 @@ export default function AppointmentsPage() {
         </div>
 
         <div>
-          <Card>
+          <Card className="sticky top-4">
             <CardHeader>
               <CardTitle>Book Appointment</CardTitle>
             </CardHeader>
@@ -118,7 +117,7 @@ export default function AppointmentsPage() {
                       mode="single"
                       selected={selectedDate}
                       onSelect={setSelectedDate}
-                      className="rounded-md border"
+                      className="rounded-md border mx-auto"
                     />
                   </div>
 
@@ -132,7 +131,7 @@ export default function AppointmentsPage() {
         </div>
       </div>
 
-      <Card className="mt-8">
+      <Card className="mt-6">
         <CardHeader>
           <CardTitle>Your Appointments</CardTitle>
         </CardHeader>
@@ -141,7 +140,7 @@ export default function AppointmentsPage() {
             {appointments?.map((appointment) => (
               <div
                 key={appointment.id}
-                className="flex items-center justify-between p-4 border rounded-lg"
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg"
               >
                 <div>
                   <p className="font-medium">
@@ -151,8 +150,8 @@ export default function AppointmentsPage() {
                     {format(new Date(appointment.date), "PPP")}
                   </p>
                 </div>
-                <div>
-                  <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">
+                <div className="mt-2 sm:mt-0">
+                  <span className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">
                     {appointment.type}
                   </span>
                 </div>
