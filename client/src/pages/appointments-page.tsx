@@ -1,8 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,9 +12,12 @@ import { format } from "date-fns";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import CounselorCard from "@/components/counselor-card";
 import type { Counselor, Appointment } from "@shared/schema";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 export default function AppointmentsPage() {
   const [selectedDate, setSelectedDate] = useState<Date>();
+  const { toast } = useToast();
 
   const { data: counselors } = useQuery<Counselor[]>({
     queryKey: ["/api/counselors"],
@@ -31,13 +34,35 @@ export default function AppointmentsPage() {
     },
   });
 
-  const onSubmit = async (data: any) => {
-    await apiRequest("POST", "/api/appointments", {
-      ...data,
-      date: selectedDate,
-    });
-    queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
-  };
+  const appointmentMutation = useMutation({
+    mutationFn: async (data: any) => {
+      if (!selectedDate) {
+        throw new Error("Please select a date for your appointment");
+      }
+
+      return await apiRequest("POST", "/api/appointments", {
+        ...data,
+        counselorId: parseInt(data.counselorId),
+        date: selectedDate.toISOString(),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      toast({
+        title: "Success",
+        description: "Appointment booked successfully!",
+      });
+      setSelectedDate(undefined);
+      form.reset();
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to book appointment",
+        variant: "destructive",
+      });
+    },
+  });
 
   return (
     <div className="container mx-auto px-4 py-6 md:py-8">
@@ -64,7 +89,7 @@ export default function AppointmentsPage() {
             </CardHeader>
             <CardContent>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={form.handleSubmit((data) => appointmentMutation.mutate(data))} className="space-y-4">
                   <FormField
                     control={form.control}
                     name="counselorId"
@@ -85,6 +110,7 @@ export default function AppointmentsPage() {
                             ))}
                           </SelectContent>
                         </Select>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -107,6 +133,7 @@ export default function AppointmentsPage() {
                             <SelectItem value="wellness">Wellness Support</SelectItem>
                           </SelectContent>
                         </Select>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -121,8 +148,19 @@ export default function AppointmentsPage() {
                     />
                   </div>
 
-                  <Button type="submit" className="w-full">
-                    Book Appointment
+                  <Button 
+                    type="submit" 
+                    className="w-full"
+                    disabled={appointmentMutation.isPending}
+                  >
+                    {appointmentMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Booking...
+                      </>
+                    ) : (
+                      "Book Appointment"
+                    )}
                   </Button>
                 </form>
               </Form>
