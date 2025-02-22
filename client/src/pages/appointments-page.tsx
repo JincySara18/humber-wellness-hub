@@ -14,7 +14,6 @@ import CounselorCard from "@/components/counselor-card";
 import type { Counselor, Appointment } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
-import { z } from "zod";
 
 export default function AppointmentsPage() {
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -28,23 +27,20 @@ export default function AppointmentsPage() {
     queryKey: ["/api/appointments"],
   });
 
-  // Extend the appointment schema with proper type handling
-  const appointmentFormSchema = z.object({
-    counselorId: z.string(),
-    type: z.enum(["career", "academic", "wellness"]),
-  });
-
-  type AppointmentFormData = z.infer<typeof appointmentFormSchema>;
-
-  const form = useForm<AppointmentFormData>({
-    resolver: zodResolver(appointmentFormSchema),
+  const form = useForm({
+    resolver: zodResolver(
+      insertAppointmentSchema.pick({
+        counselorId: true,
+        type: true,
+      })
+    ),
     defaultValues: {
-      type: "career",
+      type: "career" as const,
     },
   });
 
   const appointmentMutation = useMutation({
-    mutationFn: async (data: AppointmentFormData) => {
+    mutationFn: async (data: { counselorId: string; type: string }) => {
       if (!selectedDate) {
         throw new Error("Please select a date for your appointment");
       }
@@ -77,7 +73,7 @@ export default function AppointmentsPage() {
     },
   });
 
-  const onSubmit = (data: AppointmentFormData) => {
+  const onSubmit = (data: { counselorId: string; type: string }) => {
     if (!selectedDate) {
       toast({
         title: "Error",
@@ -129,7 +125,10 @@ export default function AppointmentsPage() {
                           </FormControl>
                           <SelectContent>
                             {counselors?.map((counselor) => (
-                              <SelectItem key={counselor.id} value={counselor.id.toString()}>
+                              <SelectItem
+                                key={counselor.id}
+                                value={counselor.id.toString()}
+                              >
                                 {counselor.name}
                               </SelectItem>
                             ))}
@@ -149,7 +148,7 @@ export default function AppointmentsPage() {
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue />
+                              <SelectValue placeholder="Select appointment type" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>

@@ -41,7 +41,11 @@ export const insertUserSchema = createInsertSchema(users).pick({
   name: true,
 });
 
-export const insertAppointmentSchema = createInsertSchema(appointments);
+export const insertAppointmentSchema = createInsertSchema(appointments).extend({
+  date: z.string().transform((val) => new Date(val)),
+  status: z.literal("scheduled"),
+  type: z.enum(["career", "academic", "wellness"]),
+});
 export const insertChatMessageSchema = createInsertSchema(chatMessages);
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
