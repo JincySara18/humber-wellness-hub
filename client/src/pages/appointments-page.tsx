@@ -6,14 +6,21 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertAppointmentSchema } from "@shared/schema";
 import { useState } from "react";
-import { format } from "date-fns";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import CounselorCard from "@/components/counselor-card";
 import type { Counselor, Appointment } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { z } from "zod";
+
+// Define the form schema
+const formSchema = z.object({
+  counselorId: z.string(),
+  type: z.enum(["career", "academic", "wellness"])
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 export default function AppointmentsPage() {
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -27,26 +34,21 @@ export default function AppointmentsPage() {
     queryKey: ["/api/appointments"],
   });
 
-  const form = useForm({
-    resolver: zodResolver(
-      insertAppointmentSchema.pick({
-        counselorId: true,
-        type: true,
-      })
-    ),
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
-      type: "career" as const,
+      type: "career",
     },
   });
 
   const appointmentMutation = useMutation({
-    mutationFn: async (data: { counselorId: string; type: string }) => {
+    mutationFn: async (data: FormData) => {
       if (!selectedDate) {
         throw new Error("Please select a date for your appointment");
       }
 
       const appointmentData = {
-        counselorId: parseInt(data.counselorId, 10),
+        counselorId: parseInt(data.counselorId),
         type: data.type,
         date: selectedDate.toISOString(),
         status: "scheduled" as const,
@@ -73,7 +75,7 @@ export default function AppointmentsPage() {
     },
   });
 
-  const onSubmit = (data: { counselorId: string; type: string }) => {
+  const onSubmit = (data: FormData) => {
     if (!selectedDate) {
       toast({
         title: "Error",
@@ -88,6 +90,7 @@ export default function AppointmentsPage() {
   return (
     <div className="container mx-auto px-4 py-6 md:py-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Counselors List */}
         <div className="lg:col-span-2">
           <Card>
             <CardHeader>
@@ -103,6 +106,7 @@ export default function AppointmentsPage() {
           </Card>
         </div>
 
+        {/* Appointment Form */}
         <div>
           <Card className="sticky top-4">
             <CardHeader>
@@ -145,7 +149,7 @@ export default function AppointmentsPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Appointment Type</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select appointment type" />
@@ -193,6 +197,7 @@ export default function AppointmentsPage() {
         </div>
       </div>
 
+      {/* Appointments List */}
       <Card className="mt-6">
         <CardHeader>
           <CardTitle>Your Appointments</CardTitle>
@@ -209,7 +214,7 @@ export default function AppointmentsPage() {
                     {counselors?.find((c) => c.id === appointment.counselorId)?.name}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {format(new Date(appointment.date), "PPP")}
+                    {new Date(appointment.date).toLocaleDateString()}
                   </p>
                 </div>
                 <div className="mt-2 sm:mt-0">
