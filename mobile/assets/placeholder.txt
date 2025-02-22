@@ -1,0 +1,6 @@
+This directory will contain:
+- icon.png (App icon)
+- splash.png (Splash screen)
+- adaptive-icon.png (Adaptive icon for modern iOS devices)
+
+Please provide the actual image assets or let me know if you'd like me to generate them.
