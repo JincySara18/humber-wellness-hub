@@ -11,6 +11,7 @@ import ChatPage from "@/pages/chat-page";
 import AppointmentsPage from "@/pages/appointments-page";
 import ResourcesPage from "@/pages/resources-page";
 import ResumeGuidePage from "@/pages/resources/resume-guide";
+import InterviewTipsPage from "@/pages/resources/interview-tips";
 import Navbar from "@/components/navbar";
 
 function Router() {
@@ -24,6 +25,7 @@ function Router() {
         <ProtectedRoute path="/appointments" component={AppointmentsPage} />
         <ProtectedRoute path="/resources" component={ResourcesPage} />
         <ProtectedRoute path="/resources/resume-guide" component={ResumeGuidePage} />
+        <ProtectedRoute path="/resources/interview-tips" component={InterviewTipsPage} />
         <Route component={NotFound} />
       </Switch>
     </>

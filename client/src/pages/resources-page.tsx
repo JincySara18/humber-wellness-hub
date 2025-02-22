@@ -10,7 +10,7 @@ export default function ResourcesPage() {
       icon: GraduationCap,
       items: [
         { title: "Resume Writing Guide", link: "/resources/resume-guide" },
-        { title: "Interview Preparation Tips", link: "#" },
+        { title: "Interview Preparation Tips", link: "/resources/interview-tips" },
         { title: "Job Search Strategies", link: "#" },
       ],
     },
