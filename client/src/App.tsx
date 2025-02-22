@@ -12,6 +12,7 @@ import AppointmentsPage from "@/pages/appointments-page";
 import ResourcesPage from "@/pages/resources-page";
 import ResumeGuidePage from "@/pages/resources/resume-guide";
 import InterviewTipsPage from "@/pages/resources/interview-tips";
+import StudySkillsPage from "@/pages/resources/study-skills";
 import Navbar from "@/components/navbar";
 
 function Router() {
@@ -26,6 +27,7 @@ function Router() {
         <ProtectedRoute path="/resources" component={ResourcesPage} />
         <ProtectedRoute path="/resources/resume-guide" component={ResumeGuidePage} />
         <ProtectedRoute path="/resources/interview-tips" component={InterviewTipsPage} />
+        <ProtectedRoute path="/resources/study-skills" component={StudySkillsPage} />
         <Route component={NotFound} />
       </Switch>
     </>

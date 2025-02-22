@@ -18,7 +18,7 @@ export default function ResourcesPage() {
       category: "Academic Success",
       icon: BookOpen,
       items: [
-        { title: "Study Skills Workshop", link: "#" },
+        { title: "Study Skills Workshop", link: "/resources/study-skills" },
         { title: "Time Management Guide", link: "#" },
         { title: "Research Methods", link: "#" },
       ],
