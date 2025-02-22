@@ -14,6 +14,7 @@ import CounselorCard from "@/components/counselor-card";
 import type { Counselor, Appointment } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { z } from "zod";
 
 export default function AppointmentsPage() {
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -27,22 +28,26 @@ export default function AppointmentsPage() {
     queryKey: ["/api/appointments"],
   });
 
+  // Extend the appointment schema to ensure counselorId is properly typed
+  const appointmentFormSchema = insertAppointmentSchema.extend({
+    counselorId: z.string().transform((val) => parseInt(val, 10)),
+  });
+
   const form = useForm({
-    resolver: zodResolver(insertAppointmentSchema),
+    resolver: zodResolver(appointmentFormSchema),
     defaultValues: {
       type: "career",
     },
   });
 
   const appointmentMutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: z.infer<typeof appointmentFormSchema>) => {
       if (!selectedDate) {
         throw new Error("Please select a date for your appointment");
       }
 
       return await apiRequest("POST", "/api/appointments", {
         ...data,
-        counselorId: parseInt(data.counselorId),
         date: selectedDate.toISOString(),
       });
     },
@@ -96,7 +101,7 @@ export default function AppointmentsPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Select Counselor</FormLabel>
-                        <Select onValueChange={field.onChange}>
+                        <Select onValueChange={field.onChange} value={field.value?.toString()}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select a counselor" />
