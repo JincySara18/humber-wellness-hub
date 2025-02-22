@@ -28,12 +28,15 @@ export default function AppointmentsPage() {
     queryKey: ["/api/appointments"],
   });
 
-  // Extend the appointment schema to ensure counselorId is properly typed
-  const appointmentFormSchema = insertAppointmentSchema.extend({
-    counselorId: z.string().transform((val) => parseInt(val, 10)),
+  // Extend the appointment schema with proper type handling
+  const appointmentFormSchema = z.object({
+    counselorId: z.string(),
+    type: z.enum(["career", "academic", "wellness"]),
   });
 
-  const form = useForm({
+  type AppointmentFormData = z.infer<typeof appointmentFormSchema>;
+
+  const form = useForm<AppointmentFormData>({
     resolver: zodResolver(appointmentFormSchema),
     defaultValues: {
       type: "career",
@@ -41,15 +44,20 @@ export default function AppointmentsPage() {
   });
 
   const appointmentMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof appointmentFormSchema>) => {
+    mutationFn: async (data: AppointmentFormData) => {
       if (!selectedDate) {
         throw new Error("Please select a date for your appointment");
       }
 
-      return await apiRequest("POST", "/api/appointments", {
-        ...data,
+      const appointmentData = {
+        counselorId: parseInt(data.counselorId, 10),
+        type: data.type,
         date: selectedDate.toISOString(),
-      });
+        status: "scheduled" as const,
+      };
+
+      const res = await apiRequest("POST", "/api/appointments", appointmentData);
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
@@ -68,6 +76,18 @@ export default function AppointmentsPage() {
       });
     },
   });
+
+  const onSubmit = (data: AppointmentFormData) => {
+    if (!selectedDate) {
+      toast({
+        title: "Error",
+        description: "Please select a date for your appointment",
+        variant: "destructive",
+      });
+      return;
+    }
+    appointmentMutation.mutate(data);
+  };
 
   return (
     <div className="container mx-auto px-4 py-6 md:py-8">
@@ -94,14 +114,14 @@ export default function AppointmentsPage() {
             </CardHeader>
             <CardContent>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit((data) => appointmentMutation.mutate(data))} className="space-y-4">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                   <FormField
                     control={form.control}
                     name="counselorId"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Select Counselor</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value?.toString()}>
+                        <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select a counselor" />
