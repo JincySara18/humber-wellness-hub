@@ -10,6 +10,7 @@ import HomePage from "@/pages/home-page";
 import ChatPage from "@/pages/chat-page";
 import AppointmentsPage from "@/pages/appointments-page";
 import ResourcesPage from "@/pages/resources-page";
+import ResumeGuidePage from "@/pages/resources/resume-guide";
 import Navbar from "@/components/navbar";
 
 function Router() {
@@ -22,6 +23,7 @@ function Router() {
         <ProtectedRoute path="/chat" component={ChatPage} />
         <ProtectedRoute path="/appointments" component={AppointmentsPage} />
         <ProtectedRoute path="/resources" component={ResourcesPage} />
+        <ProtectedRoute path="/resources/resume-guide" component={ResumeGuidePage} />
         <Route component={NotFound} />
       </Switch>
     </>

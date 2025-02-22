@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, BookOpen, GraduationCap, Heart } from "lucide-react";
+import { Link } from "wouter";
 
 export default function ResourcesPage() {
   const resources = [
@@ -8,7 +9,7 @@ export default function ResourcesPage() {
       category: "Career Development",
       icon: GraduationCap,
       items: [
-        { title: "Resume Writing Guide", link: "#" },
+        { title: "Resume Writing Guide", link: "/resources/resume-guide" },
         { title: "Interview Preparation Tips", link: "#" },
         { title: "Job Search Strategies", link: "#" },
       ],
@@ -51,16 +52,15 @@ export default function ResourcesPage() {
                 <ul className="space-y-4">
                   {category.items.map((item) => (
                     <li key={item.title}>
-                      <Button
-                        variant="link"
-                        className="text-left w-full justify-start"
-                        asChild
-                      >
-                        <a href={item.link}>
+                      <Link href={item.link}>
+                        <Button
+                          variant="link"
+                          className="text-left w-full justify-start"
+                        >
                           <FileText className="mr-2 h-4 w-4" />
                           {item.title}
-                        </a>
-                      </Button>
+                        </Button>
+                      </Link>
                     </li>
                   ))}
                 </ul>
